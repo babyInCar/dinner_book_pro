@@ -5,8 +5,8 @@
      <record id="sequence_production_lots" model="ir.sequence">
         <field name="name">Dinner Serial Numbers</field>
         <field name="code">dinner.book.pro</field>
-        <field name="prefix">DC</field>
-        <field name="padding">7</field>
+        <field name="prefix">DC%(year)s%(month)s%(day)s</field>
+        <field name="padding">4</field>
         <field name="number_next">1</field>
         <field name="number_increment">1</field>
         <field name="company_id" eval="False"/>
