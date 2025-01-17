@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="pay_wizard" model="ir.ui.view">
+            <field name="name">pay wizard</field>
+            <field name="model">pay.wizard</field>
+            <field name="arch" type="xml">
+                <form string="支付">
+                   <sheet>
+                       <group>
+                        <div>
+                            <span style="display:flex">
+                                <div style="width:94px">
+                                      <label  string="您需支付：￥" for="total_amount" class="o_light_label"/>
+                                </div>
+                                <field name="total_amount"  readonly="1" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+
+                            <!--写入黄庆琳的支付宝和微信付款码照片-->
+<!--                            <img src="/dinner_book_pro/static/src/img/alipay.jpg" alt="支付宝支付" style="max-width: 300px; max-height: 400px;"/>-->
+                            <img src="/dinner_book_pro/static/src/img/wechat.jpg" alt="微信支付" style="max-width: 300px; max-height: 400px;"/>
+                           </div>
+                       </group>
+                   </sheet>
+                    <footer>
+                        <button name="action_pay" string="已经支付" type="object" class="btn-primary"/>
+                        <button string="取消" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_pay_wizard" model="ir.actions.act_window">
+            <field name="name">餐费支付</field>
+            <field name="res_model">pay.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

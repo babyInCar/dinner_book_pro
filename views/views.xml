@@ -24,15 +24,21 @@
                         <button name="submit" type="object" string="提交" class="btn-primary" invisible="status != 'draft'"/>
                         <button name="revoke" type="object" string="撤回" class="btn-primary" invisible="status != 'book'"/>
                         <button name="cancel" type="object" string="取消" class="btn-primary" invisible="status != 'book'"/>
+                        <button name="%(dinner_book_pro.action_pay_wizard)d" type="action" string="我要支付" context="{'total_price': total_price}" class="btn-primary" invisible="pay_status != 'unpaid'"/>
                         <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h5>
-                            <font color="red">温馨提示:请及时订餐，中餐需要个人自费￥20.00，晚餐免费提供给加班到晚上8点的员工！</font>
-                        </h5>
+<!--                    <div class="oe_title">-->
+<!--                        <h5>-->
+<!--                            <font color="green">温馨提示:请及时订餐，中餐需要个人自费￥20.00，晚餐免费提供给加班到晚上8点的员工！</font>-->
+<!--                        </h5>-->
+<!--                    </div>-->
+                    <div>
+                        <field name="pay_status" invisible="1"/>
+                        <widget name="web_ribbon" title="待支付" bg_color="text-bg-danger" invisible="pay_status != 'unpaid'"/>
+                        <widget name="web_ribbon" title="已支付" bg_color="text-bg-success" invisible="pay_status != 'paid'"/>
+                        <widget name="web_ribbon" title="无需支付" bg_color="text-bg-secondary" invisible="pay_status != 'not_pay'"/>
                     </div>
-
 <!--                    <h2 style="font-size: 1.9rem;">-->
                         <group name="订餐详情">
 <!--                                    <div class="col col-md-8">-->
@@ -52,26 +58,11 @@
                             widget="sol_o2m"
                             mode="list"
                             readonly="status != 'draft'">
-<!--                            <field name="status" invisible="1"/>-->
-<!--                            <form>-->
-<!--                                &lt;!&ndash;-->
-<!--                                    We need the sequence field to be here for new lines to be added at the correct position.-->
-<!--                                    TODO: at some point we want to fix this in the framework so that an invisible field is not required.-->
-<!--                                &ndash;&gt;-->
-<!--                                <group>-->
-<!--                                    <group>-->
-<!--                                       <field name="book_date" />-->
-<!--                                        <field name="book_option" />-->
-<!--                                        <field name="shop_id" options="{'no_quick_create': True}" />-->
-<!--                                        <field name="meat" options="{'no_quick_create': True}" />-->
-<!--                                        <field name="vegetables" options="{'no_quick_create': True}" />-->
-<!--                                        <field name="drink" options="{'no_quick_create': True}" />-->
-<!--                                    </group>-->
-<!--                                </group>-->
-<!--                            </form>-->
+
                             <list
                                 string="Dinner Book Lines"
                                 editable="bottom"
+                                decoration-danger="price > 0"
                                 limit="200"
                             >
                                 <!-- Others fields -->
@@ -81,12 +72,13 @@
                                 <field name="meat" required="1" options="{'no_quick_create': True}" context="{'shop_id': shop_id}"/>
                                 <field name="vegetables" required="1" options="{'no_quick_create': True}" context="{'shop_id': shop_id}"/>
                                 <field name="drink" required="1" options="{'no_quick_create': True}" context="{'shop_id': shop_id}"/>
-                                <field name="price" readonly="1"/>
+                                <field name="price" readonly="1" force_save="1"/>
                             </list>
                         </field>
                     </page>
                     </notebook>
                 </sheet>
+
                     <!-- Chatter -->
                     <chatter/>
                 </form>

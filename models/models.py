@@ -74,7 +74,7 @@ class DinnerBookPro(models.Model):
     sn_no = fields.Char(string="流水号", default=lambda self: self.env['ir.sequence'].next_by_code('dinner.book.pro'))
     user = fields.Many2one('res.users', string="订餐人", default=lambda self: self.env.user)
     book_line = fields.One2many('dinner.book.pro.line', 'book_id', string="订餐明细")
-    pay_status = fields.Selection([('unpaid', '待支付'), ('paid', '已支付'), ('not_pay', '无需支付')], '支付状态', default='not_pay')
+    pay_status = fields.Selection([('unpaid', '待支付'), ('paid', '已支付'), ('not_pay', '无需支付')], '支付状态', compute='_compute_total_price', store=True)
     status = fields.Selection([('draft', '草稿'),
                                ('book', '已提交'),
                                ('committed', '已截止'),
@@ -86,7 +86,10 @@ class DinnerBookPro(models.Model):
         """计算总价"""
         for item in self:
             item.total_price = sum(line.price for line in item.book_line)
-            item.pay_status = 'unpaid' if item.book_line else 'not_pay'
+            if item.pay_status == 'paid':
+                continue
+            else:
+                item.pay_status = 'unpaid' if item.total_price>0 and item.pay_status != 'paid' else 'not_pay'
 
     # @api.onchange("book_option")
     # def _onchange_book_option(self):

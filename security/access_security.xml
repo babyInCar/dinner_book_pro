@@ -18,7 +18,7 @@
         <record id="manager_dinner_role" model="ir.rule">
             <field name="name">管理员可见所有的订餐记录</field>
             <field name="model_id" ref="model_dinner_book_pro"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">[('status', '=', 'book')]</field>
             <field name="groups" eval="[(4, ref('group_dinner_manager'))]"/>
         </record>
 

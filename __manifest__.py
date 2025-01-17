@@ -25,6 +25,7 @@
         'data/ir_module_data.xml',
         'security/ir.model.access.csv',
         'security/access_security.xml',
+        'wizard/pay_wizard.xml',
         'views/views.xml',
         'demo/shop.xml',
         'data/dinner_sequence_data.xml',
