@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_shop_user,res.shop,model_res_shop,base.group_user,1,0,0,0
+access_res_shop,res.shop,model_res_shop,dinner_book_pro.group_dinner_manager,1,1,1,1
+access_dinner_goods_user,dinner.goods,model_dinner_goods,base.group_user,1,0,0,0
+access_dinner_goods,dinner.goods,model_dinner_goods,dinner_book_pro.group_dinner_manager,1,1,1,1
+access_dinner_book_pro,dinner.book.pro,model_dinner_book_pro,base.group_user,1,1,1,0
+access_dinner_book_pro_manager,dinner.book.pro,model_dinner_book_pro,dinner_book_pro.group_dinner_manager,1,1,1,1
+access_dinner_book_pro_line,dinner.book.pro.line,model_dinner_book_pro_line,base.group_user,1,1,1,1
