@@ -1,31 +1,39 @@
-# coding: utf-8
-##############################################################################
+# -*- coding: utf-8 -*-
 {
-    'name': '加班订餐',
-    'version': '18.0.1.0.0',
-    'category': 'Warehouse',
-    'summary': 'This module allows to split a stock.picking',
-    'description': """With this module you can split a "stock.picking" as many times as necessary, reducing it to a stock.move.""",
-    'license': 'AGPL-3',
-    'author': "GaoShuang (www.todooweb.com)",
-    'website': "https://todooweb.com/",
-    'contributors': [
-        "Equipo Dev <devtodoo@gmail.com>",
-        "Edgar Naranjo <edgarnaranjof@gmail.com>",
-    ],
-    'support': 'devtodoo@gmail.com',
-    'depends': ['base', 'sale', 'purchase'],
+    'name': "明理订餐系统",
+
+    'summary': "Short (1 phrase/line) summary of the module's purpose",
+
+    'description': """
+      快乐加班，从吃饱饭开始！
+    """,
+
+    'author': "Gaoshuang(gaoshuang916@gmail.com)",
+    'website': "https://www.yourcompany.com",
+
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
+    # for the full list
+    'category': 'OA',
+    'version': '0.1',
+
+    # any module necessary for this one to work correctly
+    'depends': ['base', 'mail'],
+
+    # always loaded
     'data': [
+        'data/ir_module_data.xml',
         'security/ir.model.access.csv',
-        'views/stock_picking_view.xml',
+        'security/access_security.xml',
+        'views/views.xml',
+        'demo/shop.xml',
+        'data/dinner_sequence_data.xml',
+        # 'views/templates.xml',
     ],
-    'images': [
-       'static/description/screenshot_split.png'
+    # only loaded in demonstration mode
+    'demo': [
     ],
-    'live_test_url': 'https://youtu.be/HNGusvLC6ag',
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'price': 19.99,
-    'currency': 'EUR',
+    "installable": True,
+    "application": True
 }
+
