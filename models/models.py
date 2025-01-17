@@ -47,51 +47,23 @@ class DinnerBookProLine(models.Model):
     meat = fields.Many2one('dinner.goods', string="荤菜", domain=[('category', '=', 'meat')])
     vegetables = fields.Many2one('dinner.goods', string="素菜", domain=[('category', '=', 'vegetables')])
     drink = fields.Many2one('dinner.goods', string="饮品", domain=[('category', '=', 'drink')])
-    price = fields.Float(string="价格", store=True)
+    price = fields.Float(string="价格", compute='_compute_price', store=True, precompute=True)
 
     @api.depends('book_option')
-    def onchange_book_option(self):
+    def _compute_price(self):
         """设置对应的价格"""
-        self.ensure_one()
-        if self.book_option == 'launch':
-            self.price = 20
-        elif self.book_option == 'dinner':
-            self.price = 0
+        for line in self:
+            if line.book_option == 'launch':
+                line.price = 20
+            elif line.book_option == 'dinner':
+                line.price = 0
+            else:
+                line.price = 0
 
     # @api.onchange('shop_id')
     # def onchange_shop_id(self):
     #     """选择不同的商家，荤菜和素菜对应的下拉框修改"""
     #     self.env["dinner.goods"].with_context({"shop_id": self.shop_id})._search([])
-    #     if self.shop_id:
-    #         vegetables_ids = self.env['dinner.goods'].search([
-    #             ('category', '=', 'vegetables'),
-    #             ('shop_id', '=', self.shop_id.id)
-    #         ])
-    #         meat_ids = self.env['dinner.goods'].search([
-    #             ('category', '=', 'meat'),
-    #             ('shop_id', '=', self.shop_id.id)
-    #         ])
-    #         drink_ids = self.env['dinner.goods'].search([
-    #             ('category', '=', 'drink'),
-    #             ('shop_id', '=', self.shop_id.id)
-    #         ])
-    #         print(f"======{vegetables_ids.ids}")
-    #         print(f"------{meat_ids}")
-    #         vegetable_domain = [('id', 'in', vegetables_ids.ids)]
-    #         meat_domain = [('id', 'in', meat_ids.ids)]
-    #         drink_domain = [('id', 'in', drink_ids.ids)]
-    #         return {'domain': {'meat': meat_domain,
-    #                            'vegetables': vegetable_domain,
-    #                            'drink': drink_domain
-    #                 }
-    #             }
-    #     else:
-    #         return {'domain': []}
-            # self.vegetables = vegetables[0] if vegetables else False
-            # self.meat = meat[0] if meat else False
-            # self.drink = drink[0] if drink else False
-            # self.ensure_one()
-            #
 
 
 class DinnerBookPro(models.Model):
@@ -102,7 +74,7 @@ class DinnerBookPro(models.Model):
     sn_no = fields.Char(string="流水号", default=lambda self: self.env['ir.sequence'].next_by_code('dinner.book.pro'))
     user = fields.Many2one('res.users', string="订餐人", default=lambda self: self.env.user)
     book_line = fields.One2many('dinner.book.pro.line', 'book_id', string="订餐明细")
-    pay_status = fields.Selection([('unpaid', '未支付'), ('paid', '已支付'), ('not_pay', '无需支付')], '支付状态', default='not_pay')
+    pay_status = fields.Selection([('unpaid', '待支付'), ('paid', '已支付'), ('not_pay', '无需支付')], '支付状态', default='not_pay')
     status = fields.Selection([('draft', '草稿'),
                                ('book', '已提交'),
                                ('committed', '已截止'),
