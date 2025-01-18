@@ -2,13 +2,36 @@
   <data>
     <!-- explicit list view definition -->
 
+    <record id="dinner_book_pro_search" model="ir.ui.view">
+        <field name="name">dinner.book.pro.search</field>
+        <field name="model">dinner.book.pro</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="user" string="模糊查询" filter_domain="['|', ('user','ilike',self), ('sn_no','ilike',self)]" />
+                <separator/>
+                <group>
+                    <filter string="今日订餐" name="order_dinner_today" domain="[('book_line.book_date', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]" />
+                    <filter string="本周订餐" name="order_dinner_week" domain="[
+                            ('book_line.book_date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                            ('book_line.book_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                    ]"/>
+                </group>
+<!--                <field -->
+                <group expand="0" string="Group by">
+                    <filter string="支付状态" name="group_by_pay_status" context="{'group_by':'pay_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record model="ir.ui.view" id="dinner_book_pro.list">
-      <field name="name">dinner_book_pro list</field>
+      <field name="name">员工订餐列表</field>
       <field name="model">dinner.book.pro</field>
       <field name="arch" type="xml">
-        <list>
+        <list default_order="sn_no desc" decoration-info="pay_status == 'paid'" decoration-danger="pay_status == 'unpaid'">
             <field name="sn_no"/>
             <field name="user"/>
+            <field name="pay_status"/>
             <field name="status"/>
             <field name="total_price"/>
         </list>
@@ -21,10 +44,11 @@
             <field name="arch" type="xml">
                 <form string="订餐">
                     <header>
-                        <button name="submit" type="object" string="提交" class="btn-primary" invisible="status != 'draft'"/>
-                        <button name="revoke" type="object" string="撤回" class="btn-primary" invisible="status != 'book'"/>
-                        <button name="cancel" type="object" string="取消" class="btn-primary" invisible="status != 'book'"/>
-                        <button name="%(dinner_book_pro.action_pay_wizard)d" type="action" string="我要支付" context="{'total_price': total_price}" class="btn-primary" invisible="pay_status != 'unpaid'"/>
+                        <button name="submit" type="object" string="提交" class="btn-primary" invisible="status != 'draft' or pay_status == 'unpaid'"/>
+                        <button name="revoke" type="object" string="撤回" class="btn-primary" confirm="确定撤回吗？撤回后，可重新编辑后提交" invisible="status != 'book' or user != uid or pay_status != 'unpaid'"/>
+                        <button name="cancel" type="object" string="取消" class="btn-danger" confirm="确定取消吗？" invisible="status != 'book' or user != uid"/>
+                        <button name="%(dinner_book_pro.action_pay_wizard)d" type="action" string="我要支付" context="{'total_price': total_price}" class="btn-primary" invisible="pay_status != 'unpaid' or user != uid"/>
+                        <button name="reject" type="object" string="未收到餐费，退回申请" confirm="确定退回该申请单吗？" class="btn-danger" invisible="status != 'book' or pay_status != 'paid'" groups="dinner_book_pro.group_dinner_manager"/>
                         <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                 <sheet>
@@ -42,9 +66,9 @@
 <!--                    <h2 style="font-size: 1.9rem;">-->
                         <group name="订餐详情">
 <!--                                    <div class="col col-md-8">-->
-                            <group cols="2">
+                            <group>
                                 <field name="sn_no" readonly="1"/>
-                                <field name="user" readonly="1"/>
+                                <field name="user" readonly="1" options='{"no_open": True}'/>
                                 <field name="total_price" readonly="1"/>
                             </group>
                         </group>
@@ -76,6 +100,19 @@
                             </list>
                         </field>
                     </page>
+                    </notebook>
+
+                    <notebook>
+                        <page string="操作日志明细">
+                            <field name="flow_trace_ids" widget="one2many" onlabel="1" readonly="1">
+                                <list string="操作日志" default_order="id desc">
+                                    <field name="operator"/>
+                                    <field name="create_date" string="操作时间"/>
+                                    <field name="operation"/>
+                                    <field name="operator_comment"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
 

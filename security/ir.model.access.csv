@@ -7,3 +7,4 @@ access_dinner_book_pro,dinner.book.pro,model_dinner_book_pro,base.group_user,1,1
 access_dinner_book_pro_manager,dinner.book.pro,model_dinner_book_pro,dinner_book_pro.group_dinner_manager,1,1,1,1
 access_dinner_book_pro_line,dinner.book.pro.line,model_dinner_book_pro_line,base.group_user,1,1,1,1
 access_pay_wizard,access.pay.wizard,model_pay_wizard,base.group_user,1,1,1,0
+access_ase_operation_trace,access.base.operation.trace,model_base_operation_trace,base.group_user,1,1,1,0
