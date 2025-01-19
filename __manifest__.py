@@ -18,7 +18,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail'],
+    'depends': ['base'],
 
     # always loaded
     'data': [
@@ -26,6 +26,8 @@
         'security/ir.model.access.csv',
         'security/access_security.xml',
         'wizard/pay_wizard.xml',
+        'views/login_edit.xml',
+        'views/menu.xml',
         'views/views.xml',
         'demo/shop.xml',
         'data/dinner_sequence_data.xml',

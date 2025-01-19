@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <template id="dinner_book_pro.layout" inherit_id="web.layout">
+        <xpath expr="//title" position="replace">
+            <title t-esc="title or '明理点餐系统'"/>
+        </xpath>
+<!--        <xpath expr="//link" position="replace">-->
+<!--            <link type="image/x-icon" rel="shortcut icon" t-att-href="x_icon or '/base_oa/static/src/img/favicon.ico'"/>-->
+<!--        </xpath>-->
+    </template>
+
+    <!-- 替换登录页的'数据库管理'和'由odoo提供支持'-->
+    <template id="login_layout" inherit_id="web.login_layout">
+        <xpath expr="//a[@href='/web/database/manager']" position="replace">
+
+        </xpath>
+        <xpath expr="//a[@href='https://www.odoo.com?utm_source=db&amp;utm_medium=auth']" position="replace">
+
+        </xpath>
+    </template>
+    <!-- 替换登录页面的账号和密码  -->
+    <template id="login" inherit_id="web.login" name="Login Inherit">
+        <xpath expr="//label[@for='login']" position="replace">
+            <p>账号</p>
+        </xpath>
+        <xpath expr="//input[@name='login']" position="attributes">
+            <attribute name="placeholder">请输入账号!</attribute>
+        </xpath>
+        <xpath expr="//label[@for='password']" position="replace">
+            <p>密码</p>
+        </xpath>
+        <xpath expr="//input[@name='password']" position="attributes">
+            <attribute name="placeholder">请输入密码!</attribute>
+        </xpath>
+    </template>
+    <!-- 隐藏登录下面的重置密码和没有账户功能 -->
+<!--    <template id="dinner_book_pro.login" inherit_id="web.login" name="Sign up - Reset Password">-->
+<!--        <xpath expr="//button[@type='submit']" position="after">-->
+<!--            <div class="justify-content-between mt-2 d-flex small">-->
+<!--                &lt;!&ndash; <a t-if="signup_enabled" t-attf-href="/web/signup?{{ keep_query() }}">Don't have an account?</a>-->
+<!--                <a t-if="reset_password_enabled" t-attf-href="/web/reset_password?{{ keep_query() }}">Reset Password</a> &ndash;&gt;-->
+<!--            </div>-->
+<!--        </xpath>-->
+<!--    </template>-->
+
+</odoo>

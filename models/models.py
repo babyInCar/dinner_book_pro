@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
-from datetime import timedelta
+from odoo.exceptions import ValidationError, UserError
+from datetime import timedelta, datetime
 
 
 class Shop(models.Model):
@@ -71,6 +71,17 @@ class DinnerBookProLine(models.Model):
             else:
                 line.price = 0
 
+    @api.onchange('book_option', 'book_date')
+    def _onchange_book_option(self):
+        if self.book_date and self.book_date.strftime("%Y-%m-%d") < datetime.today().strftime("%Y-%m-%d"):
+            raise ValidationError(_("订餐日期不能早于今天"))
+        if self.book_date and self.book_option:
+            book_obj = self.search([('book_date', '=', self.book_date), ('book_option', '=', self.book_option),
+                             ('book_id.status', '!=', 'cancel')])
+            if book_obj:
+                option_dict = {'launch': '午餐', 'dinner': '晚餐'}
+                raise ValidationError(_(f"检测到您已经在{self.book_date}有{option_dict.get(self.book_option)}的订餐记录，请检查后重新提交！"))
+
     # @api.onchange('shop_id')
     # def onchange_shop_id(self):
     #     """选择不同的商家，荤菜和素菜对应的下拉框修改"""
@@ -79,8 +90,9 @@ class DinnerBookProLine(models.Model):
 
 class DinnerBookPro(models.Model):
     _name = 'dinner.book.pro'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    # _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'dinner_book_pro'
+    _rec_name = 'user'
 
     sn_no = fields.Char(string="流水号", default=lambda self: self.env['ir.sequence'].next_by_code('dinner.book.pro'))
     user = fields.Many2one('res.users', string="订餐人", default=lambda self: self.env.user)
@@ -120,6 +132,8 @@ class DinnerBookPro(models.Model):
         self.ensure_one()
         # if self.search([('book_date', '=', self.book_date), ('status', '=', 'book')]):
         #     raise Exception("该日期已有订餐记录，请修改日期")
+        if not self.book_line:
+            raise UserError("您未添加任何订餐明细！")
         self._add_process_trace('submit')
         self.write({'status': 'book'})
 
@@ -148,6 +162,7 @@ class DinnerBookPro(models.Model):
     def reject(self):
         """未收到付款，退回申请"""
         self.ensure_one()
+        self._add_process_trace('reject', '未收到款')
         self.sudo().write({'pay_status': 'unpaid'})
 
     # def commit(self):
