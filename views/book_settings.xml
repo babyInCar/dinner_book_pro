@@ -1,0 +1,68 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+
+    <record model="ir.ui.view" id="dinner_goods_list">
+      <field name="name">菜品列表</field>
+      <field name="model">dinner.goods</field>
+      <field name="arch" type="xml">
+        <list editable="bottom">
+          <field name="shop_id"/>
+          <field name="category"/>
+          <field name="goods_name"/>
+        </list>
+      </field>
+    </record>
+
+
+     <record model="ir.ui.view" id="res_shop_list">
+      <field name="name">菜品列表</field>
+      <field name="model">res.shop</field>
+      <field name="arch" type="xml">
+        <list editable="bottom">
+          <field name="name"/>
+          <field name="goods_ids" widget="one2many"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="res_shop_list">
+      <field name="name">菜品列表</field>
+      <field name="model">book.settings</field>
+      <field name="arch" type="xml">
+        <list editable="bottom">
+          <field name="active"/>
+          <field name="launch_deadline" />
+          <field name="dinner_deadline" />
+        </list>
+      </field>
+    </record>
+
+     <record model="ir.actions.act_window" id="res_shop_action_window">
+      <field name="name">商家信息设置</field>
+      <field name="res_model">res.shop</field>
+      <field name="view_mode">list</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="dinner_book_pro_setting_action">
+      <field name="name">订餐设置</field>
+      <field name="res_model">book.settings</field>
+      <field name="view_mode">list</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="dish_goods_action_window">
+      <field name="name">菜品设置</field>
+      <field name="res_model">dinner.goods</field>
+      <field name="view_mode">list</field>
+    </record>
+
+      <menuitem name="设置" id="dinner_book_pro_setting" parent="dinner_book_pro.menu_root" sequence="20"/>
+
+      <menuitem name="商家信息设置" id="res_shop_setting" parent="dinner_book_pro_setting"
+              action="res_shop_action_window" groups="dinner_book_pro.group_dinner_manager"/>
+    <menuitem name="菜品信息设置" id="dish_goods_setting" parent="dinner_book_pro_setting"
+              action="dish_goods_action_window" groups="dinner_book_pro.group_dinner_manager"/>
+      <menuitem name="订餐设置" id="dinner_book_setting" parent="dinner_book_pro_setting"
+              action="dinner_book_pro_setting_action" groups="dinner_book_pro.group_dinner_manager"/>
+  </data>
+</odoo>
