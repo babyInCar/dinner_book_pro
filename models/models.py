@@ -13,15 +13,6 @@ class Shop(models.Model):
     goods_ids = fields.One2many("dinner.goods", 'shop_id', string="菜单")
 
 
-# class DishMenu(models.Model):
-#     _name = "dish.menu"
-#     _description = '菜单'
-
-    # menu_id = fields.Many2one('res.shop', string="菜单id")
-    # category = fields.Selection([('meat', '荤菜'), ('vegetables', '素菜'), ('drink', '饮品')], '类别')
-    # goods_ids = fields.One2many("dinner.goods", string="晕菜/素菜/饮品")
-
-
 class DinnerGoods(models.Model):
     _name = "dinner.goods"
     _description = '菜品名称'
@@ -52,13 +43,6 @@ class DinnerBookProLine(models.Model):
     drink = fields.Many2one('dinner.goods', string="饮品", domain=[('category', '=', 'drink')])
     price = fields.Float(string="价格", compute='_compute_price', precompute=True, store=True)
 
-    @api.constrains('book_date')
-    def _check_book_date(self):
-        """设定订餐时间在30天以内"""
-        for record in self:
-            if record.book_date and record.book_date < fields.Date.today() and \
-                    record.book_date > fields.Date.today() + timedelta(days=30):
-                raise ValidationError(_("订餐日期不能早于今天"))
 
     @api.depends('book_option')
     def _compute_price(self):
@@ -76,11 +60,18 @@ class DinnerBookProLine(models.Model):
         if self.book_date and self.book_date.strftime("%Y-%m-%d") < datetime.today().strftime("%Y-%m-%d"):
             raise ValidationError(_("订餐日期不能早于今天"))
         if self.book_date and self.book_option:
+            book_obj = self.env['book.settings'].sudo().search([('active', '=', True)])
+            # 判断是否超出了订餐的时间
+            if book_obj and self.book_date.strftime("%Y-%m-%d") == datetime.today().strftime("%Y-%m-%d"):
+                if self.book_option == 'launch' and book_obj.launch_deadline < (datetime.now()+timedelta(hours=8)).strftime("%H:%M"):
+                    raise ValidationError(_(f"已过午餐订餐时间：{book_obj.launch_deadline}，下次记得提前订餐哦^_^"))
+                elif self.book_option == 'dinner' and book_obj.dinner_deadline < (datetime.now()+timedelta(hours=8)).strftime("%H:%M"):
+                    raise ValidationError(_(f"已过晚餐订餐时间：{book_obj.dinner_deadline}，下次记得提前订餐哦^_^"))
             book_obj = self.search([('book_date', '=', self.book_date), ('book_option', '=', self.book_option),
                              ('book_id.status', '!=', 'cancel')])
             if book_obj:
                 option_dict = {'launch': '午餐', 'dinner': '晚餐'}
-                raise ValidationError(_(f"检测到您已经在{self.book_date}有{option_dict.get(self.book_option)}的订餐记录，请检查后重新提交！"))
+                raise ValidationError(_(f"检测到您已经在{self.book_date}有{option_dict.get(self.book_option)}的订餐记录，请检查后重新选择！"))
 
     # @api.onchange('shop_id')
     # def onchange_shop_id(self):
@@ -103,7 +94,6 @@ class DinnerBookPro(models.Model):
                                   '支付状态', compute='_compute_total_price', store=True, compute_sudo=False)
     status = fields.Selection([('draft', '草稿'),
                                ('book', '已提交'),
-                               ('committed', '已截止'),
                                ('cancel', '已取消')], default='draft', string="点餐状态")
     total_price = fields.Float(string="总价", compute='_compute_total_price', store=True, compute_sudo=False)
     flow_trace_ids = fields.One2many('base.operation.trace', 'book_flow_id', string="当前申请单处理流水")
@@ -117,15 +107,6 @@ class DinnerBookPro(models.Model):
                 continue
             else:
                 item.pay_status = 'unpaid' if item.total_price>0 and item.pay_status != 'paid' else 'not_pay'
-
-    # @api.onchange("book_option")
-    # def _onchange_book_option(self):
-    #     """设置对应的荤菜下拉框"""
-    #     self.ensure_one()
-    #     if self.book_option == 'launch':
-    #         self.pay_status = 'not_pay'
-    #     elif self.book_option == 'dinner':
-    #         self.pay_status = 'unpaid'
 
     def submit(self):
         """提交当前单据"""
@@ -165,13 +146,7 @@ class DinnerBookPro(models.Model):
         self._add_process_trace('reject', '未收到款')
         self.sudo().write({'pay_status': 'unpaid'})
 
-    # def commit(self):
-    #     """自动提交当前所有的订单"""
-    #     for item in self:
-    #         item.status = "committed"
 
-
-# todo: 添加操作日志
 class BaseOperationTrace(models.Model):
     _name = "base.operation.trace"
     _rec_name = "operator"
@@ -189,3 +164,13 @@ class BaseOperationTrace(models.Model):
     operator_comment = fields.Char('操作人评论')
     type = fields.Selection([('approve', '审批'), ('comment', '评论')], '流水类型', default='approve')
     active = fields.Boolean(default=True)
+
+
+class BookSettings(models.Model):
+    _name = "book.settings"
+    _description = "订餐设置"
+
+    active = fields.Boolean(string="是否启用")
+    launch_deadline = fields.Char(string="午餐截止时间")
+    dinner_deadline = fields.Char(string="晚餐截止时间")
+

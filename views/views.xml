@@ -71,16 +71,11 @@
                         <button name="submit" type="object" string="提交" class="btn-primary" invisible="status != 'draft' or pay_status == 'unpaid'"/>
                         <button name="revoke" type="object" string="撤回" class="btn-primary" confirm="确定撤回吗？撤回后，可重新编辑后提交" invisible="status != 'book' or user != uid or pay_status != 'unpaid'"/>
                         <button name="cancel" type="object" string="取消" class="btn-danger" confirm="确定取消吗？" invisible="status != 'book' or user != uid"/>
-                        <button name="%(dinner_book_pro.action_pay_wizard)d" type="action" string="支付" context="{'total_price': total_price}" class="btn-primary" invisible="pay_status != 'unpaid' or user != uid"/>
+                        <button name="%(dinner_book_pro.action_pay_wizard)d" type="action" string="支付餐费" context="{'total_price': total_price}" class="btn-primary" invisible="pay_status != 'unpaid' or user != uid"/>
                         <button name="reject" type="object" string="未收到餐费，退回申请" confirm="确定退回该申请单吗？" class="btn-danger" invisible="status != 'book' or pay_status != 'paid'" groups="dinner_book_pro.group_dinner_manager"/>
                         <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                 <sheet>
-<!--                    <div class="oe_title">-->
-<!--                        <h5>-->
-<!--                            <font color="green">温馨提示:请及时订餐，中餐需要个人自费￥20.00，晚餐免费提供给加班到晚上8点的员工！</font>-->
-<!--                        </h5>-->
-<!--                    </div>-->
                     <div>
                         <field name="pay_status" invisible="1"/>
                         <widget name="web_ribbon" title="待支付" bg_color="text-bg-danger" invisible="pay_status != 'unpaid'"/>
@@ -90,9 +85,11 @@
 <!--                    <h2 style="font-size: 1.9rem;">-->
                         <group name="订餐详情">
 <!--                                    <div class="col col-md-8">-->
-                            <group>
+                            <group col="2">
                                 <field name="sn_no" readonly="1"/>
                                 <field name="user" readonly="1" options='{"no_open": True}'/>
+                            </group>
+                            <group col="2">
                                 <field name="total_price" readonly="1"/>
                             </group>
                         </group>
@@ -146,24 +143,14 @@
             </field>
         </record>
 
-   <record model="ir.ui.view" id="dinner_goods_list">
-      <field name="name">菜品列表</field>
-      <field name="model">dinner.goods</field>
-      <field name="arch" type="xml">
-        <list editable="bottom">
-          <field name="shop_id"/>
-          <field name="category"/>
-          <field name="goods_name"/>
-        </list>
-      </field>
-    </record>
 
   <record model="ir.ui.view" id="dinner_book_pro_line_list">
       <field name="name">订餐统计</field>
       <field name="model">dinner.book.pro.line</field>
       <field name="arch" type="xml">
         <list create="false" edit="false" delete="false">
-            <field name="book_id"/>
+            <field name="book_id" string="订餐人"/>
+            <field name="belonged_company"/>
             <field name="book_date"/>
             <field name="book_option"/>
             <field name="shop_id"/>
@@ -174,16 +161,7 @@
       </field>
     </record>
 
-  <record model="ir.ui.view" id="res_shop_list">
-      <field name="name">菜品列表</field>
-      <field name="model">res.shop</field>
-      <field name="arch" type="xml">
-        <list editable="bottom">
-          <field name="name"/>
-          <field name="goods_ids" widget="one2many"/>
-        </list>
-      </field>
-    </record>
+
     <!-- actions opening views on models -->
 
     <record model="ir.actions.act_window" id="dinner_book_pro_action_window">
@@ -199,17 +177,7 @@
       <field name="domain">[('book_id.pay_status','in', ('paid', 'not_pay')), ('book_id.status', '=', 'book')]</field>
    </record>
 
-  <record model="ir.actions.act_window" id="res_shop_action_window">
-      <field name="name">商家信息设置</field>
-      <field name="res_model">res.shop</field>
-      <field name="view_mode">list</field>
-    </record>
 
-    <record model="ir.actions.act_window" id="dish_goods_action_window">
-      <field name="name">菜品设置</field>
-      <field name="res_model">dinner.goods</field>
-      <field name="view_mode">list</field>
-    </record>
     <!-- server action to the one above -->
 
     <record model="ir.actions.server" id="dinner_book_pro.action_server">
@@ -228,22 +196,17 @@
 
     <!-- Top menu item -->
 
-    <menuitem name="明理订餐" id="dinner_book_pro.menu_root" groups="base.group_user"/>
+    <menuitem name="湖北病理订餐系统" id="dinner_book_pro.menu_root" groups="base.group_user"/>
 
     <!-- menu categories -->
     <menuitem name="订餐" id="dinner_book_pro_order" parent="dinner_book_pro.menu_root" groups="base.group_user" sequence="10"/>
-    <menuitem name="设置" id="dinner_book_pro_setting" parent="dinner_book_pro.menu_root" sequence="20"/>
+
 
     <!-- actions -->
-
     <menuitem name="订餐" id="dinner_book" parent="dinner_book_pro_order"
               action="dinner_book_pro_action_window" groups="base.group_user"/>
     <menuitem name="订餐统计" id="dinner_book_statics" parent="dinner_book_pro_order"
              action="dinner_book_pro_line_action" groups="dinner_book_pro.group_dinner_manager"/>
 
-    <menuitem name="商家信息设置" id="res_shop_setting" parent="dinner_book_pro_setting"
-              action="res_shop_action_window" groups="dinner_book_pro.group_dinner_manager"/>
-    <menuitem name="菜品设置" id="dish_goods_setting" parent="dinner_book_pro_setting"
-              action="dish_goods_action_window" groups="dinner_book_pro.group_dinner_manager"/>
-  </data>
+    </data>
 </odoo>
