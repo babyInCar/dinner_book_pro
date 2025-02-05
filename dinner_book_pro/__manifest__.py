@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "明理订餐系统",
+    'name': "Dinner Order System",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
     'description': """
-      快乐加班，从吃饱饭开始！
+      Order dinner for your employees，from now on and from here！
     """,
 
     'author': "Gaoshuang(gaoshuang916@gmail.com)",
