@@ -36,6 +36,8 @@
     # only loaded in demonstration mode
     'demo': [
     ],
+    'price': 29.99,
+    'currency': 'USD',
     "installable": True,
     "application": True
 }
