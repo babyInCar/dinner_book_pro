@@ -22,9 +22,9 @@
 
     # always loaded
     'data': [
-        'data/ir_module_data.xml',
-        'security/ir.model.access.csv',
+        'data/ir_module_data.xml',        
         'security/access_security.xml',
+        'security/ir.model.access.csv',
         'wizard/pay_wizard.xml',
         'views/login_edit.xml',
         'views/menu.xml',
